@@ -1,7 +1,12 @@
 ### Task parameters
+import os
+if os.getlogin() == 'guningquan':
+    DATA_DIR = '/mnt/ssd1/guningquan/Programs_server/act_dataset_checkpoint/dataset'
+elif os.getlogin() == 'ubuntu20':
+    DATA_DIR = '/home/robot/Dataset_and_Checkpoint/dataset'
+else:
+    raise ValueError(f"Unknown user: {os.getlogin()}")
 
-# DATA_DIR = '/mnt/ssd1/guningquan/Programs_server/act_dataset_checkpoint/dataset'
-DATA_DIR = '/home/robot/Dataset_and_Checkpoint/dataset'
 TASK_CONFIGS = {
 
     'alarm_random_pos_dataset': {
