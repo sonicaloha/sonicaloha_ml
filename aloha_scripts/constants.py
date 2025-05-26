@@ -40,7 +40,7 @@ TASK_CONFIGS = {
                          ]
     },
 
-    'alarm_random_pos_vgg_plus_cross': {
+    'alarm_random_pos_cnn14_plus_cross': {
         'dataset_dir': DATA_DIR + '/alarm_random_pos',
         'episode_len': 1000,  # 900
         'camera_names': ['cam_high',
@@ -50,7 +50,7 @@ TASK_CONFIGS = {
                          ]
     },
 
-    'boxlockdown_vgg_plus_cross_200audio': {
+    'boxlockdown_cnn14_plus_cross_200audio': {
         'dataset_dir': DATA_DIR + '/boxlockdown',
         'episode_len': 750,  # 900
         'camera_names': ['cam_high',

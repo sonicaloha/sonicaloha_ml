@@ -115,7 +115,7 @@ You can set this information in `TASK_CONFIGS` of `aloha_scripts/constants.py`. 
    1. ✅ Set up your training configuration in ``aloha_scripts/constants.py``:
 
       ```python
-      'alarm_vgg_plus_cross_100audio': {
+      'alarm_cnn14_plus_cross_100audio': {
         'dataset_dir': DATA_DIR + '/alarm_random_pos',
         'episode_len': 1000,  # 900
         'camera_names': ['cam_high',
@@ -125,7 +125,7 @@ You can set this information in `TASK_CONFIGS` of `aloha_scripts/constants.py`. 
                          ]
        },
    
-       'boxlockdown_vgg_plus_cross_200audio': {
+       'boxlockdown_cnn14_plus_cross_200audio': {
            'dataset_dir': DATA_DIR + '/boxlockdown',
            'episode_len': 750,  # 900
            'camera_names': ['cam_high',
@@ -136,7 +136,7 @@ You can set this information in `TASK_CONFIGS` of `aloha_scripts/constants.py`. 
        },
    
    
-       'stapler_checking_vgg_plus_cross_150audio': {
+       'stapler_checking_cnn14_plus_cross_150audio': {
            'dataset_dir': DATA_DIR + '/stapler_checking',
            'episode_len': 600,
            'camera_names': ['cam_high',
@@ -152,7 +152,7 @@ You can set this information in `TASK_CONFIGS` of `aloha_scripts/constants.py`. 
    ``` sh
    export CUDA_VISIBLE_DEVICES= 0, 1
    python imitate_episodes_multi_gpu.py  \
-   --task_name alarm_vgg_plus_cross_100audio \
+   --task_name alarm_cnn14_plus_cross_100audio \
    --ckpt_dir  <data save dir>  \
    --policy_class SonicAloha \
    --kl_weight 10 --chunk_size 100 \
@@ -169,7 +169,7 @@ You can set this information in `TASK_CONFIGS` of `aloha_scripts/constants.py`. 
    ```sh
    export CUDA_VISIBLE_DEVICES= 0
    python imitate_episodes_multi_gpu.py  \
-   --task_name alarm_vgg_plus_cross_100audio \
+   --task_name alarm_cnn14_plus_cross_100audio \
    --ckpt_dir  <data save dir>  \
    --policy_class SonicAloha \
    --kl_weight 10 --chunk_size 100 \
