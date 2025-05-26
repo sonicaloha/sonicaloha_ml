@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from torch.autograd import Variable
 import torch.nn.functional as F
-from .backbone import build_backbone, build_sonic_backbone_mlp, build_sonic_backbone_vggish
+from .backbone import build_backbone, build_sonic_backbone_mlp, build_sonic_backbone_vggish, build_sonic_backbone_cnn14
 from .transformer import build_transformer, TransformerEncoder, TransformerEncoderLayer
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,7 +21,7 @@ import copy
 import IPython
 e = IPython.embed
 
-sonic_decoder = "vgg" # "vgg" "mlp"
+sonic_decoder = "cnn14" # "vgg" "mlp" "cnn14"
 fusion = "plus_cross" #  False, "plus_cross"
 
 def reparametrize(mu, logvar):
@@ -71,6 +71,18 @@ class DETRVAEAUDIO(nn.Module):
 
         if backbones is not None:
             self.input_proj = nn.Conv2d(backbones[0].num_channels, hidden_dim, kernel_size=1)
+            self.input_proj_audio = torch.nn.Sequential(
+                torch.nn.Conv2d(512, 512, kernel_size=1),
+                torch.nn.Upsample(size=(15, 20), mode='bilinear', align_corners=False),
+                torch.nn.BatchNorm2d(512),
+                torch.nn.ReLU(),
+            )
+            self.input_proj_audio_pos = torch.nn.Sequential(
+                torch.nn.Conv2d(512, 512, kernel_size=1),
+                torch.nn.Upsample(size=(15, 20), mode='bilinear', align_corners=False),
+                torch.nn.BatchNorm2d(512),
+                torch.nn.ReLU(),
+            )
             self.backbones = nn.ModuleList(backbones)
             self.input_proj_robot_state = nn.Linear(state_dim, hidden_dim)
             if fusion:
@@ -285,9 +297,26 @@ class DETRVAEAUDIO(nn.Module):
                 audio_features, audio_pos = self.backbones[-1](mel_spec_db)
                 audio_features = audio_features[0]
                 audio_pos = audio_pos[0]
-                # print("audio_features befor pro shape is",audio_features.shape)
-                audio_features = self.input_proj(audio_features)
+                audio_features = self.input_proj_audio(audio_features)
+                audio_pos = self.input_proj_audio_pos(audio_pos)
                 # exit()
+            elif sonic_decoder == "cnn14":
+                device = audio.device
+                try:
+                    audio_sampling_rate = audio_sampling_rate[0]  # 尝试执行
+                except Exception as e:
+                    pass  # 如果报错，就跳过
+
+                target_sample_rate = 32000  # need to modify
+                resample_transform = T.Resample(orig_freq=audio_sampling_rate, new_freq=target_sample_rate).to(device)
+                audio = resample_transform(audio)
+                audio_features, audio_pos = self.backbones[-1](audio)
+                audio_features = audio_features[0]
+                audio_pos = audio_pos[0]
+                # print("audio_features befor pro shape is",audio_features.shape)
+                # audio_features = self.input_proj(audio_features)
+                audio_features = self.input_proj_audio(audio_features)
+                audio_pos = self.input_proj_audio_pos(audio_pos)
 
             elif sonic_decoder == "mlp" :
                 device = audio.device
@@ -328,19 +357,25 @@ class DETRVAEAUDIO(nn.Module):
                 audio_features = audio_features[0]
                 audio_pos = audio_pos[0]
                 # print("audio_features befor pro shape is",audio_features.shape)
-                audio_features = self.input_proj(audio_features)
+                audio_features = self.input_proj_audio(audio_features)
+                audio_pos = self.input_proj_audio_pos(audio_pos)
                 # exit()
 
 
             if fusion == False:
                 # target_size = (15, 20)  # may need to modify
-                target_size = all_cam_features[-1].shape[-2:]
+                # target_size = all_cam_features[-1].shape[-2:]
                 # print("the audio_features shape is ", audio_features.shape)
                 # print("the all_cam_features shape is",all_cam_features[-1].shape)
                 # exit()
 
-                audio_features = F.interpolate(audio_features, size=target_size, mode="bilinear", align_corners=False) # modify
-                audio_pos = F.interpolate(audio_pos, size=target_size, mode="bilinear", align_corners=False)
+                target_size = all_cam_features[-1].shape[-2:]
+
+                if audio_features.shape[-2:] != target_size:
+                    # print("interpolating")
+                    audio_features = F.interpolate(audio_features, size=target_size, mode="bilinear",
+                                                   align_corners=False)
+                    audio_pos = F.interpolate(audio_pos, size=target_size, mode="bilinear", align_corners=False)
 
                 all_cam_features.append(audio_features)
                 all_cam_pos.append(audio_pos)
@@ -357,8 +392,11 @@ class DETRVAEAUDIO(nn.Module):
                     # target_size = (15, 20)  # may need to modify
                     target_size = all_cam_features[-1].shape[-2:]
 
-                    audio_features = F.interpolate(audio_features, size=target_size, mode="bilinear", align_corners=False)
-                    audio_pos = F.interpolate(audio_pos, size=target_size, mode="bilinear", align_corners=False)
+                    if audio_features.shape[-2:] != target_size:
+                        # print("interpolating")
+                        audio_features = F.interpolate(audio_features, size=target_size, mode="bilinear",
+                                                       align_corners=False)
+                        audio_pos = F.interpolate(audio_pos, size=target_size, mode="bilinear", align_corners=False)
 
                     all_audio_features.append(audio_features)
                     all_cam_pos.append(audio_pos)
@@ -803,6 +841,8 @@ def build_sonic(args):
 
     if sonic_decoder == "vgg" : # "vgg"  "resnet" "resnet38" "yamnet"
         backbones.append(build_sonic_backbone_vggish(args)) # vgg
+    elif sonic_decoder == "cnn14":
+        backbones.append(build_sonic_backbone_cnn14(args)) # for cnn14
     elif sonic_decoder == "mlp" : # "vgg"  "resnet" "resnet38" "yamnet"
         backbones.append(build_sonic_backbone_mlp(args)) # vgg
 

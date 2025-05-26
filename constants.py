@@ -40,7 +40,7 @@ TASK_CONFIGS = {
                          ]
     },
 
-    'alarm_random_pos_vgg_plus_cross': {
+    'alarm_vgg_plus_cross_100audio': {
         'dataset_dir': DATA_DIR + '/alarm_random_pos',
         'episode_len': 1000,  # 900
         'camera_names': ['cam_high',

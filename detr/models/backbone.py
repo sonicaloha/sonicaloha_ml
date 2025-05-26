@@ -207,6 +207,71 @@ class MLPBackbone(nn.Module):
         return {"mlp_out": x}
 
 
+class Cnn14Backbone(nn.Module):
+    def __init__(self, checkpoint_path):
+        super().__init__()
+
+        # Load the Cnn14 pretrained model (used for initialization during training only)
+        # Note: During validation or testing, if model.load_state_dict(...) is called later, the pretrained weights loaded here will be overwritten by the trained model weights.
+        self.full_model = AudioTagging(checkpoint_path=checkpoint_path).model
+
+        if isinstance(self.full_model, nn.DataParallel):
+            self.full_model = self.full_model.module
+
+        self.spectrogram_extractor = self.full_model.spectrogram_extractor
+
+        self.logmel_extractor = self.full_model.logmel_extractor
+        self.spec_augmenter = self.full_model.spec_augmenter
+        self.bn0 = self.full_model.bn0
+
+        # ✅ `Cnn14` 有 6 个 `ConvBlock`
+        self.conv_block1 = self.full_model.conv_block1
+        self.conv_block2 = self.full_model.conv_block2
+        self.conv_block3 = self.full_model.conv_block3
+        self.conv_block4 = self.full_model.conv_block4
+
+
+    def forward(self, x):
+
+        # ✅ 计算 Log-Mel 频谱
+        x = self.spectrogram_extractor(x)  # (batch, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)  # (batch, 1, time_steps, mel_bins)
+
+        x = x.transpose(1, 3)  # 调整维度为 [batch, channels, mel_bins, time]
+        x = self.bn0(x)
+        x = x.transpose(1, 3)  # 再次调整维度 [batch, channels, time, mel_bins]
+
+
+        # print("self.training is",self.training)  # may need to modfiy
+        if self.training :  # TODO may need to modfiy @gnq
+            x = self.spec_augmenter(x)
+
+
+        # ✅ 逐层通过 `ConvBlock`
+        x = self.conv_block1(x, pool_size=(2, 2), pool_type="avg")
+        x = F.dropout(x, p=0.2, training=self.training)
+        x = self.conv_block2(x, pool_size=(2, 2), pool_type="avg")
+        x = F.dropout(x, p=0.2, training=self.training)
+        x = self.conv_block3(x, pool_size=(2, 2), pool_type="avg")
+        x = F.dropout(x, p=0.2, training=self.training)
+        x = self.conv_block4(x, pool_size=(2, 2), pool_type="avg")
+        x = F.dropout(x, p=0.2, training=self.training)
+
+        return {
+            "conv_block4": x }
+
+def build_sonic_backbone_cnn14(args):
+
+    position_embedding = build_position_encoding(args)  # 位置编码
+    train_backbone = args.lr_backbone > 0  # 是否训练 backbone
+
+    checkpoint_path = None
+
+    backbone = Cnn14Backbone(checkpoint_path)  # 加载 Cnn14_mAP Backbone
+
+    model = Joiner(backbone, position_embedding)
+    model.num_channels = 512  # ResNet38 的 `conv4` 具有 512 维特征
+    return model
 
 def build_sonic_backbone_vggish(args):
     position_embedding = build_position_encoding(args)
