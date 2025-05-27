@@ -263,7 +263,7 @@ class Cnn14Backbone(nn.Module):
 def build_sonic_backbone_cnn14(args):
 
     position_embedding = build_position_encoding(args)  # 位置编码
-    train_backbone = args.lr_backbone > 0  # 是否训练 backbone
+    # train_backbone = args.lr_backbone > 0  # 是否训练 backbone
 
     checkpoint_path = None
 
