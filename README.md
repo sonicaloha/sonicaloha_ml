@@ -25,7 +25,7 @@ Other configurations may work as well, but they have not been tested yet. If you
 
 ## 🔧 Hardware Setting
 1. Install the 4 robots and 4 cameras according to the original [ALOHA](https://github.com/tonyzhaozh/aloha). 
-2. Plug in your USB microphone and mount it beside the top-view camera.
+2. Plug in the USB microphone and mount it next to the top-view camera. We use the FIFINE K053 USB Lavalier Lapel Microphone, available at this [link](https://www.amazon.co.jp/-/en/gp/product/B077Y974JF/ref=ox_sc_act_title_1?smid=A17LS08GT0UYE7&psc=1).
 3. ❗ Camera Focus Configuration (Not described in ALOHA):
 
    The cameras in the ALOHA series are set to **fixed focus** in ROS launch. 
@@ -70,7 +70,7 @@ The focus value is configured through `aloha.launch` in `aloha/launch`:
     cd detr && pip install -e .
 ```
 ## 📑 Dataset Collection
-1. 🤖 **TactileAloha robot system launch:**
+1. 🤖 **SonicAloha robot system launch:**
 We assume you have installed your robot system according to [ALOHA](https://github.com/tonyzhaozh/aloha). This step launches the four robot arms, four cameras.
     ``` ROS
     # ROS terminal

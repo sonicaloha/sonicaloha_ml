@@ -640,7 +640,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=1):
                         # exp_weights = torch.from_numpy(exp_weights).cuda().unsqueeze(dim=1)
                         # raw_action = (actions_for_curr_step[-num_selected:] * exp_weights).sum(dim=0, keepdim=True)
 
-                        k =   -0.01 # -0.01 0.01
+                        k =   - 0.01 # -0.01 0.01
                         exp_weights = np.exp(-k * np.arange(len(actions_for_curr_step)))
                         exp_weights = exp_weights / exp_weights.sum()
                         exp_weights = torch.from_numpy(exp_weights).cuda().unsqueeze(dim=1)
