@@ -26,7 +26,13 @@ Other configurations may work as well, but they have not been tested yet. If you
 ## 🔧 Hardware Setting
 1. Install the 4 robots and 4 cameras according to the original [ALOHA](https://github.com/tonyzhaozh/aloha). 
 2. Plug in the USB microphone and mount it next to the top-view camera. We use the FIFINE K053 USB Lavalier Lapel Microphone, available at this [link](https://www.amazon.co.jp/-/en/gp/product/B077Y974JF/ref=ox_sc_act_title_1?smid=A17LS08GT0UYE7&psc=1).
-3. ❗ Camera Focus Configuration (Not described in ALOHA):
+3. You can check your microphone by running:
+   ```
+   python aloha_scripts/record_audio.py
+   ```
+   This will generate an audio file named "selected_audio.wav".
+
+4. ❗ Camera Focus Configuration (Not described in ALOHA):
 
    The cameras in the ALOHA series are set to **fixed focus** in ROS launch. 
 The focus value is configured through `aloha.launch` in `aloha/launch`:  
@@ -46,7 +52,7 @@ The focus value is configured through `aloha.launch` in `aloha/launch`:
    ```
     - Test and note the appropriate focus value for each camera ;
 
-3. `❗` Disable Auto Focus:
+5. `❗` Disable Auto Focus:
 
    You must disable the continuous autofocus by setting the focus_automatic_continuous control parameter as follows:
     ```bash

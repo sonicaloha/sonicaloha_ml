@@ -6,8 +6,8 @@ FORMAT = pyaudio.paInt16  # 16-bit 音频
 CHANNELS = 1  # 单声道
 RATE = 48000  # 采样率 (Hz)
 CHUNK = 512  # 每个缓冲区大小
-RECORD_SECONDS = 30  # 录音时长
-OUTPUT_FILENAME = "selected_camera_audio.wav"  # 输出文件名
+RECORD_SECONDS = 5  # 录音时长
+OUTPUT_FILENAME = "selected_audio.wav"  # 输出文件名
 
 
 # TARGET_DEVICE_NAME = "C922 Pro Stream Webcam: USB Audio (hw:5,0)"
