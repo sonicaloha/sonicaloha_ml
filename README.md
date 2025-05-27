@@ -156,7 +156,7 @@ You can set this information in `TASK_CONFIGS` of `aloha_scripts/constants.py`. 
 ```Audio_Lenght_For_Learning = 100   # 100 200 150```
 2. 🚀 Train your policy:
    ``` sh
-   export CUDA_VISIBLE_DEVICES= 0, 1
+   export CUDA_VISIBLE_DEVICES= 0,1
    python imitate_episodes_multi_gpu.py  \
    --task_name alarm_cnn14_plus_cross_100audio \
    --ckpt_dir  <data save dir>  \

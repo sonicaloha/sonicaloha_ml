@@ -873,61 +873,6 @@ def build_sonic(args):
 
     return model
 
-def build_tactile(args):
-    state_dim = 14 # TODO hardcode
-
-    # From state
-    # backbone = None # from state for now, no need for conv nets
-    # From image
-    backbones = []
-    for camera_name in args.camera_names:
-        # print("building tactile model for camera {}".format(camera_name))
-        # # backbone = build_backbone(args)
-        # # backbones.append(backbone)
-        # print("cbam for all")
-        # backbone = build_CBAM_backbone_mask(args, window_pos=None)  # attention + mask
-        # backbones.append(backbone)
-
-        if 'cam' in camera_name:
-            # backbone = build_CBAM_backbone(args) # attention
-            # window_pos = (0, 0, 640, 120)
-            # backbone = build_CBAM_backbone_mask(args, window_pos = None) # attention + mask
-            backbone = build_backbone(args)
-            backbones.append(backbone)
-        elif 'gel' in camera_name:
-            # print("unet for tactile info.")
-            # backbone = build_tactile_backbone(args)  # unet
-            print("resnet for tactile info.")
-            backbone = build_backbone(args)
-            backbones.append(backbone)
-
-    transformer = build_transformer(args)
-
-    if args.no_encoder:
-        encoder = None
-    else:
-        # encoder = build_transformer(args) # gnq comment
-        encoder = build_encoder(args) # gnq add
-
-    model = DETRVAE(
-        backbones,
-        transformer,
-        encoder,
-        state_dim=state_dim,
-        num_queries=args.num_queries,
-        camera_names=args.camera_names,
-        vq=args.vq,
-        vq_class=args.vq_class,
-        vq_dim=args.vq_dim,
-        action_dim=args.action_dim,
-    )
-
-    n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print("*"*150)
-    print("number of parameters: %.2fM" % (n_parameters/1e6,))
-
-    return model
-
 def build_cnnmlp(args):
     state_dim = 14 # TODO hardcode
 
