@@ -331,7 +331,7 @@ def capture_one_episode(dt, max_timesteps, camera_names, dataset_dir, dataset_na
             max_substeps = 2048   # may need to modify
             audio_chunks_np = np.zeros((max_timesteps, max_substeps), dtype=np.int16)
             for t in range(max_timesteps):
-                # 合并该时间步的所有 chunks
+                # Merge all chunks of this time step
                 audio_data = np.frombuffer(b"".join(audio_chunks[t]), dtype=np.int16)
                 if len(audio_data) > max_substeps - 1:
                     raise ValueError(

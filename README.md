@@ -75,7 +75,51 @@ The focus value is configured through `aloha.launch` in `aloha/launch`:
     pip install -r requirements.txt
     cd detr && pip install -e .
 ```
-## 📑 Dataset Collection
+
+## 📑 Dataset
+### Dataset Description:
+We utilize human teleoperation to collect demonstration data.
+During each task's data collection, information is recorded at each timestep within an episode.
+Specifically, each timestep includes the current robot joint values, images from the active cameras (top-view, right arm, left arm, and front-view), and the corresponding audio segment captured at that timestep, which are compressed and saved as HDF5 files.
+The structure of the dataset is illustrated in the following structure tree:
+```
+<dataset_root>/
+└── <task_name>/                # e.g., alarm_shutting, stapler_checking, etc.,
+    ├── episode_0/
+    ├── ...
+    ├── episode_18/
+    │   ├── timestep_xxx/
+    │   │   ├── robot_joint_value         # Joint positions
+    │   │   ├── camera/                   # Camera images (number of cameras is configurable)
+    │   │   │   ├── rgb_cam_top
+    │   │   │   ├── rgb_cam_right_arm
+    │   │   │   ├── rgb_cam_left_arm
+    │   │   │   ├── rgb_cam_front
+    │   │   ├── audio_current_recorded    # Audio segment for this timestep
+    │   │
+    │   ├── timestep_34/
+    │   ├── ...
+    ├── episode_19/
+    ├── ...
+```
+This timestep-aligned data collection method can help address synchronization issues in multimodal information, especially in long-horizon tasks.
+However, because different timesteps may have inconsistent wall-clock durations, the length of audio_current_recorded may vary.
+In our code, for each timestep, we allocate a fixed-size array large enough to store the corresponding audio segment.
+The audio segment data for each timestep is stored sequentially from the beginning of the array, with the last element used to record the actual length of the audio data for that timestep.
+
+For each timestep, the audio segment data is stored in a fixed-size array as follows:
+```
++----------------+----------------+-----+----------------+-----+------------------+
+| sample[0]      | sample[1]      | ... | sample[N-1]    | ... | length_of_audio  |
++----------------+----------------+-----+----------------+-----+------------------+
+      ↑                ↑                      ↑                      ↑
+  Audio sample 0   Audio sample 1      Last audio sample      Number of valid samples
+```
+
+This design facilitates efficient retrieval of the audio data for each timestep and allows for flexible composition of fixed-length audio segments during subsequent training.
+Although HDF5's variable-length storage was considered, it was found that this approach could easily lead to out-of-memory errors during training.
+
+### Dataset Collection Process:
 1. 🤖 **SonicAloha robot system launch:**
 We assume you have installed your robot system according to [ALOHA](https://github.com/tonyzhaozh/aloha). This step launches the four robot arms, four cameras.
     ``` ROS

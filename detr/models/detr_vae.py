@@ -21,7 +21,7 @@ import copy
 import IPython
 e = IPython.embed
 
-sonic_decoder = "cnn14" # "vgg" "mlp" "cnn14"
+sonic_decoder = "cnn14" # "mlp" "cnn14"
 fusion = "plus_cross" #  False, "plus_cross"
 
 def reparametrize(mu, logvar):
