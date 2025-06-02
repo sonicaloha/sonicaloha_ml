@@ -213,21 +213,6 @@ def capture_one_episode(dt, max_timesteps, camera_names, dataset_dir, dataset_na
         print(f'\n\nfreq_mean is {freq_mean}, lower than 30, re-collecting... \n\n\n\n')
         return False
 
-    """
-    For each timestep:
-    observations
-    - images
-        - cam_high          (480, 640, 3) 'uint8'
-        - cam_low           (480, 640, 3) 'uint8'
-        - cam_left_wrist    (480, 640, 3) 'uint8'
-        - cam_right_wrist   (480, 640, 3) 'uint8'
-    - qpos                  (14,)         'float64'
-    - qvel                  (14,)         'float64'
-    
-    action                  (14,)         'float64'
-    base_action             (2,)          'float64'
-    """
-
     data_dict = {
         '/observations/qpos': [],
         '/observations/qvel': [],

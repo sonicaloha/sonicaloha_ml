@@ -88,7 +88,7 @@ The structure of the dataset is illustrated in the following structure tree:
     ├── episode_0/
     ├── ...
     ├── episode_18/
-    │   ├── timestep_xxx/
+    │   ├── timestep_t/
     │   │   ├── robot_joint_value         # Joint positions
     │   │   ├── camera/                   # Camera images (number of cameras is configurable)
     │   │   │   ├── rgb_cam_top
@@ -97,7 +97,7 @@ The structure of the dataset is illustrated in the following structure tree:
     │   │   │   ├── rgb_cam_front
     │   │   ├── audio_current_recorded    # Audio segment for this timestep
     │   │
-    │   ├── timestep_34/
+    │   ├── timestep_t+1/
     │   ├── ...
     ├── episode_19/
     ├── ...
