@@ -69,7 +69,7 @@ The focus value is configured through `aloha.launch` in `aloha/launch`:
     Error setting controls: Permission denied
     VIDIOC_S_EXT_CTRLS: failed: Permission denied
     ```
-   - You can also add the following to your .bashrc so that the cameras-autofocus command runs automatically each time.
+   - You can add the following to your `.bashrc`, which allows you to conveniently run `cameras-autofocus` from the command line.
    ```bash
    # Define the cameras-autofocus function to disable autofocus
    cameras-autofocus() {
@@ -99,7 +99,6 @@ The focus value is configured through `aloha.launch` in `aloha/launch`:
        echo "Autofocus configuration complete."
    }
     ```
-
    Note: You will need to reapply the focus_automatic_continuous=0 setting whenever you reboot the computer or unplug and replug the cameras.
 
 ## 🛠️ Installation
