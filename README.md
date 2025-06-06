@@ -44,26 +44,62 @@ The focus value is configured through `aloha.launch` in `aloha/launch`:
     The recommended procedure to find a suitable focus value is:
     - To check the available video devices, run the following command: 
    ``` bash
-     ls /dev/video*
-   ```
+     ls /dev/CAM_*  # or ls /dev/video*
+   ```   
+    If you have set your camera serial numbers according to [ALOHA](https://github.com/tonyzhaozh/aloha), you can see your camera list as follows:
+   ``` bash
+     /dev/CAM_HIGH  /dev/CAM_LEFT_WRIST  /dev/CAM_LOW  /dev/CAM_RIGHT_WRIST
+   ```  
+   
     - Use the following command to open the camera and adjust the focus: 
    ``` bash
-     guvcview -d /dev/video0
+     guvcview -d /dev/CAM_HIGH
    ```
     - Test and note the appropriate focus value for each camera ;
 
 5. `❗` Disable Auto Focus:
 
-   You must disable the continuous autofocus by setting the focus_automatic_continuous control parameter as follows:
+   - You must disable the continuous autofocus by setting the focus_automatic_continuous control parameter as follows:
     ```bash
-      v4l2-ctl -d /dev/video0 --set-ctrl focus_automatic_continuous=0
+      v4l2-ctl -d /dev/CAM_HIGH --set-ctrl focus_automatic_continuous=0
     ```
-    For other cameras please modifiy `/dev/video0` to  `/dev/video2`, `/dev/video4`, etc.
-    The way to check whether we have set the camera correctly is to run `roslaunch aloha aloha.launch` and ensure that no warning like this appears:
+    - For other cameras please modifiy `/dev/CAM_HIGH` to  `/dev/CAM_LOW`, `/dev/CAM_LEFT_WRIST`, etc.
+    - The way to check whether we have set the camera correctly is to run `roslaunch aloha aloha.launch` and ensure that no warning like this appears:
     ```bash
     Error setting controls: Permission denied
     VIDIOC_S_EXT_CTRLS: failed: Permission denied
     ```
+   - You can also add the following to your .bashrc so that the cameras-autofocus command runs automatically each time.
+   ```bash
+   # Define the cameras-autofocus function to disable autofocus
+   cameras-autofocus() {
+       # List of camera devices to configure
+       cameras=("/dev/CAM_HIGH" "/dev/CAM_LEFT_WRIST" "/dev/CAM_LOW" "/dev/CAM_RIGHT_WRIST")
+   
+       # Function to disable autofocus for a single camera
+       disable_autofocus() {
+           local camera=$1
+           echo "Disabling autofocus for $camera..."
+           
+           # Disable automatic continuous focus
+           v4l2-ctl -d "$camera" --set-ctrl focus_automatic_continuous=0
+   
+           echo "Autofocus disabled for $camera."
+       }
+   
+       # Main loop to process all cameras
+       echo "Configuring autofocus for cameras..."
+       for cam in "${cameras[@]}"; do
+           if [ -e "$cam" ]; then
+               disable_autofocus "$cam"
+           else
+               echo "Camera $cam not found. Skipping."
+           fi
+       done
+       echo "Autofocus configuration complete."
+   }
+    ```
+
    Note: You will need to reapply the focus_automatic_continuous=0 setting whenever you reboot the computer or unplug and replug the cameras.
 
 ## 🛠️ Installation
